@@ -5,7 +5,7 @@ from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, ServiceCon
 from llama_index.llms.openai import OpenAI
 from llama_index.core.agent import ReActAgent
 from llama_index.core.tools import QueryEngineTool, ToolMetadata, FunctionTool
-from llama_index.agent.openai import OpenAIAgent
+from llama_index.core.agent import FunctionCallingAgentWorker
 from llama_index.core.memory import ChatMemoryBuffer
 import pandas as pd
 from twilio.rest import Client
@@ -105,8 +105,15 @@ Remember to follow the below rules strictly:
 # Initialize the agent
 llm = OpenAI(temperature=0, model="gpt-4o")
 memory = ChatMemoryBuffer.from_defaults(token_limit=2048)
-agent = OpenAIAgent.from_tools([subsidy_tool, sms_tool], system_prompt=CUSTOM_PROMPT, memory=memory, llm=llm)
-
+llm = OpenAI(temperature=0, model="gpt-4")
+memory = ChatMemoryBuffer.from_defaults(token_limit=2048)
+agent_worker = FunctionCallingAgentWorker.from_tools(
+  [subsidy_tool, sms_tool], system_prompt=CUSTOM_PROMPT, 
+  memory=memory, llm=llm
+  verbose=True,
+  allow_parallel_tool_calls=False,
+)
+agent = agent_worker.as_agent()
 
 @app.route("/voice", methods=['POST'])
 def voice():
