@@ -10,7 +10,7 @@ from llama_index.core.memory import ChatMemoryBuffer
 import pandas as pd
 from twilio.rest import Client
 
-
+import import requests
 # Set up OpenAI API key
 os.environ["OPENAI_API_KEY"] = ""
 
